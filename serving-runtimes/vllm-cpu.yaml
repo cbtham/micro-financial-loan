@@ -1,0 +1,57 @@
+# Import this in Red Hat AI Serving Runtime
+# ALPHA VERSION: This is a work in progress and may not work as expected.
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    opendatahub.io/recommended-accelerators: "[]"
+    openshift.io/display-name: vLLM CPU (x86) ServingRuntime for KServe
+    opendatahub.io/apiProtocol: REST
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: vllm-cpu-x86-runtime
+spec:
+  annotations:
+    opendatahub.io/kserve-runtime: vllm
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+  containers:
+    - args:
+        - --port=8080
+        - --model=/mnt/models
+        - --served-model-name={{.Name}}
+        - --host=0.0.0.0
+        - --trust-remote-code
+        - --max-model-len=4096
+      command:
+        - python
+        - -m
+        - vllm.entrypoints.openai.api_server
+      env:
+        - name: HOME
+          value: /tmp
+        - name: HF_HOME
+          value: /tmp/hf_home
+        - name: XDG_CACHE_HOME
+          value: /tmp/.cache
+        - name: VLLM_CPU_OMP_THREADS_BIND
+          value: 0-7
+        - name: VLLM_CPU_KVCACHE_SPACE
+          value: "8"
+      image: public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:latest
+      name: kserve-container
+      ports:
+        - containerPort: 8080
+          protocol: TCP
+      volumeMounts:
+        - mountPath: /dev/shm
+          name: shm
+  multiModel: false
+  supportedModelFormats:
+    - autoSelect: true
+      name: vLLM
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 8Gi
+      name: shm

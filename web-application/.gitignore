@@ -1,0 +1,16 @@
+# Environment files
+.env
+
+# Python
+__pycache__/
+*.pyc
+
+# Docker
+.docker/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store

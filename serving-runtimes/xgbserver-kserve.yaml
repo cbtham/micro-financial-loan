@@ -1,0 +1,36 @@
+# Import this in Red Hat AI Serving Runtime
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: kserve-xgbserver
+  labels:
+    opendatahub.io/dashboard: "true"
+  annotations:
+    openshift.io/display-name: xgbserver XGBoost ServingRuntime for KServe
+    openshift.io/description: Official KServe XGBoost server supporting native
+      XGBoost formats (.bst, .json, .ubj)
+    opendatahub.io/apiProtocol: REST
+spec:
+  multiModel: false
+  protocolVersions:
+    - v1
+    - v2
+  supportedModelFormats:
+    - name: xgboost
+      version: "1"
+      autoSelect: true
+      priority: 1
+  containers:
+    - name: kserve-container
+      image: kserve/xgbserver:latest
+      args:
+        - --model_name={{.Name}}
+        - --model_dir=/mnt/models
+        - --http_port=8080
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: "1"
+          memory: 1Gi

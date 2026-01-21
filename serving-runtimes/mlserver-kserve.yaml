@@ -1,0 +1,54 @@
+# Import this in Red Hat AI Serving Runtime
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  name: kserve-mlserver
+  labels:
+    opendatahub.io/dashboard: "true"
+  annotations:
+    openshift.io/display-name: MLServer Multi-Framework ServingRuntime for KServe
+    openshift.io/description: MLServer supporting SKLearn, XGBoost, LightGBM, and
+      MLflow formats (.joblib, .pkl, .bst, .json)
+    opendatahub.io/apiProtocol: REST
+spec:
+  multiModel: false
+  protocolVersions:
+    - v2
+  supportedModelFormats:
+    - name: sklearn
+      version: "1"
+      autoSelect: true
+      priority: 2
+    - name: xgboost
+      version: "1"
+      autoSelect: true
+      priority: 2
+    - name: lightgbm
+      version: "3"
+      autoSelect: true
+      priority: 2
+    - name: mlflow
+      version: "2"
+      autoSelect: true
+      priority: 2
+  containers:
+    - name: kserve-container
+      image: docker.io/seldonio/mlserver:1.6.0
+      env:
+        - name: MLSERVER_MODEL_NAME
+          value: "{{.Name}}"
+        - name: MLSERVER_HTTP_PORT
+          value: "8080"
+        - name: MLSERVER_GRPC_PORT
+          value: "8081"
+        - name: MLSERVER_MODEL_URI
+          value: /mnt/models/model.joblib
+        - name: MLSERVER_MODEL_IMPLEMENTATION
+          value: mlserver_sklearn.SKLearnModel
+      resources:
+        requests:
+          cpu: 500m
+          memory: 2Gi
+        limits:
+          cpu: "2"
+          memory: 4Gi

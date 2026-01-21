@@ -1,0 +1,31 @@
+# Import this in Red Hat AI Serving Runtime
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    openshift.io/description: Hugging Face runtime for T5 transformer models
+    openshift.io/display-name: Hugging Face T5 Runtime
+    opendatahub.io/apiProtocol: REST
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: huggingface-t5-runtime
+spec:
+  containers:
+    - args:
+        - --model_name={{.Name}}
+        - --model_dir=/mnt/models
+      image: kserve/huggingfaceserver:v0.13.0
+      name: kserve-container
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4Gi
+        requests:
+          cpu: "1"
+          memory: 2Gi
+  multiModel: false
+  protocolVersions:
+    - v2
+  supportedModelFormats:
+    - autoSelect: true
+      name: huggingface
