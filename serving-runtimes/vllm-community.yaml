@@ -43,7 +43,7 @@ spec:
           value: /tmp/flashinfer
         - name: TRITON_CACHE_DIR
           value: /tmp/triton_cache
-      image: vllm/vllm-openai:v0.12.0
+      image: vllm/vllm-openai:v0.15.1
       name: kserve-container
       ports:
         - containerPort: 8080
