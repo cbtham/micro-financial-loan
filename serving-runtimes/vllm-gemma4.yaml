@@ -1,15 +1,13 @@
-# Import this in Red Hat AI Serving Runtime
-# Vllm community runtime.
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
   annotations:
     opendatahub.io/apiProtocol: REST
     opendatahub.io/recommended-accelerators: '["nvidia.com/gpu"]'
-    opendatahub.io/template-display-name: Latest vLLM NVIDIA ServingRuntime for KServe
-    opendatahub.io/template-name: vllm-runtime-latest
-    openshift.io/display-name: Latest vLLM NVIDIA ServingRuntime for KServe
-  name: vllm-runtime-latest
+    opendatahub.io/template-display-name: Preview vLLM NVIDIA ServingRuntime for KServe
+    opendatahub.io/template-name: vllm-runtime-gemma4
+    openshift.io/display-name: Preview vLLM NVIDIA ServingRuntime for KServe
+  name: vllm-runtime-gemma4
   labels:
     opendatahub.io/dashboard: "true"
 spec:
@@ -43,7 +41,7 @@ spec:
           value: /tmp/flashinfer
         - name: TRITON_CACHE_DIR
           value: /tmp/triton_cache
-      image: vllm/vllm-openai:v0.19.1
+      image: vllm/vllm-openai:gemma4
       name: kserve-container
       ports:
         - containerPort: 8080
