@@ -13,8 +13,8 @@ spec:
     - args:
         - --model_name={{.Name}}
         - --model_dir=/mnt/models
-        - --task=sentence-similarity
-      image: kserve/huggingfaceserver:v0.13.0
+        - --task=text-embedding
+      image: kserve/huggingfaceserver:v0.14.0
       name: kserve-container
       resources:
         limits:
