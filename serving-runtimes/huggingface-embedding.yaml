@@ -14,6 +14,7 @@ spec:
         - --model_name={{.Name}}
         - --model_dir=/mnt/models
         - --task=text_embedding
+        - --device=cpu
       image: kserve/huggingfaceserver:v0.14.0
       name: kserve-container
       resources:
