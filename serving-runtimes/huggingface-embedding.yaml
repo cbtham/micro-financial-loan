@@ -1,0 +1,31 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ServingRuntime
+metadata:
+  annotations:
+    openshift.io/description: Hugging Face runtime for embedding models
+    openshift.io/display-name: Hugging Face Embedding Runtime
+    opendatahub.io/apiProtocol: REST
+  labels:
+    opendatahub.io/dashboard: "true"
+  name: huggingface-embedding-runtime
+spec:
+  containers:
+    - args:
+        - --model_name={{.Name}}
+        - --model_dir=/mnt/models
+        - --task=sentence-similarity
+      image: kserve/huggingfaceserver:v0.13.0
+      name: kserve-container
+      resources:
+        limits:
+          cpu: "2"
+          memory: 8Gi
+        requests:
+          cpu: "1"
+          memory: 4Gi
+  multiModel: false
+  protocolVersions:
+    - v2
+  supportedModelFormats:
+    - autoSelect: true
+      name: huggingface
