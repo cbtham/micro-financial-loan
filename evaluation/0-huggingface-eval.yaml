@@ -1,0 +1,45 @@
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: qwen3-huggingface-eval
+  namespace: a-rh-department
+spec:
+  # Evaluate the base Qwen3 model directly from HuggingFace
+  # This works even if InferenceService is not ready
+  allowOnline: true
+  allowCodeExecution: false
+  
+  model: hf
+  modelArgs:
+    - name: pretrained
+      value: Qwen/Qwen3-4B-Instruct-2507
+  
+  # Simple classification task
+  taskList:
+    taskRecipes:
+      - card:
+          name: "cards.wnli"
+        template:
+          name: "templates.classification.multi_class.relation.default"
+        logSamples: true
+  
+  logSamples: true
+  batchSize: "8"
+  limit: "50"  # Limit to 50 samples for faster execution
+  
+  # GPU resources for faster evaluation
+  pod:
+    container:
+      resources:
+        limits:
+          cpu: '4'
+          memory: 16Gi
+          nvidia.com/gpu: '1'
+        requests:
+          cpu: '2'
+          memory: 8Gi
+          nvidia.com/gpu: '1'
+  
+  outputs:
+    pvcManaged:
+      size: 2Gi

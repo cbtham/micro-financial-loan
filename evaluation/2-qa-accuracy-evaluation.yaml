@@ -1,0 +1,65 @@
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: qwen3-qa-accuracy-eval
+  namespace: a-rh-department
+spec:
+  allowOnline: true
+  allowCodeExecution: true
+  
+  # Evaluate the deployed Qwen3 model
+  model: local-chat-completions
+  modelArgs:
+    - name: model
+      value: qwen3-ft-loan-explanation
+    - name: base_url
+      value: https://qwen3-ft-loan-explanation-a-rh-department.apps.cluster-94v2k.94v2k.sandbox393.opentlc.com/v1/chat/completions
+    - name: num_concurrent
+      value: "1"
+    - name: max_retries
+      value: "3"
+    - name: tokenized_requests
+      value: "false"
+    - name: tokenizer
+      value: Qwen/Qwen3-4B-Instruct-2507
+  
+  # Multiple evaluation tasks for Q&A accuracy
+  taskList:
+    taskRecipes:
+      # Natural language inference
+      - card:
+          name: "cards.wnli"
+        template:
+          name: "templates.classification.multi_class.relation.default"
+        logSamples: true
+      
+      # Reading comprehension
+      - card:
+          name: "cards.boolq"
+        template:
+          name: "templates.qa.multiple_choice.with_context.title"
+        logSamples: true
+  
+  logSamples: true
+  batchSize: "1"
+  limit: "50"  # Limit to 50 samples per task for faster evaluation
+  
+  pod:
+    container:
+      resources:
+        limits:
+          cpu: '2'
+          memory: 8Gi
+        requests:
+          cpu: '1'
+          memory: 4Gi
+      env:
+        - name: OPENAI_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: default-editor-shm-token
+              key: token
+  
+  outputs:
+    pvcManaged:
+      size: 2Gi

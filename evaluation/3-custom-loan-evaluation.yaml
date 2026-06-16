@@ -1,0 +1,81 @@
+apiVersion: trustyai.opendatahub.io/v1alpha1
+kind: LMEvalJob
+metadata:
+  name: qwen3-custom-loan-eval
+  namespace: a-rh-department
+spec:
+  allowOnline: true
+  allowCodeExecution: true
+  
+  # Evaluate deployed Qwen3 model
+  model: local-chat-completions
+  modelArgs:
+    - name: model
+      value: qwen3-ft-loan-explanation
+    - name: base_url
+      value: https://qwen3-ft-loan-explanation-a-rh-department.apps.cluster-94v2k.94v2k.sandbox393.opentlc.com/v1/chat/completions
+    - name: num_concurrent
+      value: "1"
+    - name: max_retries
+      value: "3"
+    - name: tokenized_requests
+      value: "false"
+    - name: tokenizer
+      value: Qwen/Qwen3-4B-Instruct-2507
+  
+  # Custom evaluation card for loan explanation quality
+  taskList:
+    taskRecipes:
+      - card:
+          custom: |
+            {
+              "__type__": "task_card",
+              "loader": {
+                "__type__": "load_hf",
+                "path": "json",
+                "split": "train",
+                "data_files": "https://huggingface.co/datasets/banking77/raw/main/banking77.json"
+              },
+              "preprocess_steps": [
+                {
+                  "__type__": "rename",
+                  "field": "text",
+                  "to_field": "question"
+                },
+                {
+                  "__type__": "set",
+                  "fields": {
+                    "context": "A customer is asking about their loan application"
+                  }
+                }
+              ],
+              "task": "tasks.qa.with_context.extractive",
+              "templates": "templates.qa.with_context.all"
+            }
+        template:
+          name: "templates.qa.with_context.simple"
+        logSamples: true
+  
+  logSamples: true
+  batchSize: "1"
+  limit: "20"  # Test with 20 samples
+  
+  pod:
+    container:
+      resources:
+        limits:
+          cpu: '2'
+          memory: 8Gi
+        requests:
+          cpu: '1'
+          memory: 4Gi
+      env:
+        - name: OPENAI_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: default-editor-shm-token
+              key: token
+  
+  outputs:
+    pvcManaged:
+      size: 2Gi
