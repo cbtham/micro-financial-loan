@@ -408,7 +408,7 @@ def call_llm_explanation(data, result):
         
         # Use messages format with anti-repetition parameters (EXACTLY like original Flask app)
         payload = {
-            "model": "qwen3-4b-ft-microloan",
+            "model": "qwen3-fine-tuned-loan-advisor",
             "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -543,7 +543,7 @@ def explain_stream():
     user_prompt = f"Explain loan decision: credit_score={int(credit_score)}, income=${int(income)}, loan_amount=${int(loan_amount)}, approval_probability={approval_prob:.1f}%, default_risk={default_prob:.1f}%, decision={decision.lower()}"
     
     payload = {
-        "model": "qwen3-4b-ft-microloan",
+        "model": "qwen3-fine-tuned-loan-advisor",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
