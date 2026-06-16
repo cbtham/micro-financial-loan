@@ -12,7 +12,7 @@ applicant = Entity(
 # Offline source - schema-only parquet seeded in repo; replaced by notebook data
 applicant_stats_source = FileSource(
     name="applicant_stats_source",
-    path="feature_repo/data/applicant_features.parquet",
+    path="data/applicant_features.parquet",
     timestamp_field="event_timestamp",
     created_timestamp_column="created_timestamp",
 )
